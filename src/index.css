@@ -9,6 +9,15 @@ body {
   display: grid;
   place-items: center;
   height: 100vh;
+  background: linear-gradient(45deg, #222, #555);
+}
+
+.phone {
+  padding: 10px;
+  border-radius: 12px;
+  background-color: #aaa;
+  box-shadow: inset 2px 2px 10px rgba(0,0,0,0.8),
+                    6px 8px 6px rgba(0,0,0,0.4);
 }
 
 .App {

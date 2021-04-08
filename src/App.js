@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const api = {
   key: '3eb916e1f9ad41c6a59f8168cf8099bb',
@@ -6,6 +6,7 @@ const api = {
 };
 
 function App() {
+  // const [location, setLocation] = useState(null);
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState({});
   const [error, setError] = useState(null);
@@ -37,32 +38,54 @@ function App() {
     return `${day} ${date} ${month} ${year}`
   }
 
+  useEffect( () => {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const {latitude, longitude} = position.coords;
+      console.log(latitude, longitude);
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=imperial&appid=${api.key}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          setWeather(data);
+          setQuery('');
+        })
+        .catch(err => {
+          console.log(err.message);
+          setError(err);
+        })
+          
+    });
+  }, []);
+
   return (
-    <div className="App ">
-      <main>
-        <div className="search-box">
-          <input 
-            type="text"
-            className="search-bar"
-            placeholder="Search..."
-            onChange ={e => setQuery(e.target.value)}
-            value={query}
-            onKeyPress={search}
-          />
-        </div>
-        {(typeof weather.main != "undefined") ? (
-          <div>
-            <div className="location-box">
-              <div className="location">{weather.name}, {weather.sys.country}</div>
-              <div className="date">{dateBuilder(new Date())}</div>
-            </div>
-            <div className="weather-box">
-              <div className="temp">{Math.round(weather.main.temp)}</div>
-              <div className="weather">{weather.weather[0].description}</div>
-            </div>  
+    <div className="phone">
+      <div className="App ">
+        <main>
+          <div className="search-box">
+            <input 
+              type="text"
+              className="search-bar"
+              placeholder="Search..."
+              onChange ={e => setQuery(e.target.value)}
+              value={query}
+              onKeyPress={search}
+            />
           </div>
-        ) : ('')}
-      </main>
+          {(typeof weather.main != "undefined") ? (
+            <div>
+              <div className="location-box">
+                <div className="location">{weather.name}, {weather.sys.country}</div>
+                <div className="date">{dateBuilder(new Date())}</div>
+              </div>
+              <div className="weather-box">
+                <div className="temp">{Math.round(weather.main.temp)}</div>
+                <div className="weather">{weather.weather[0].description}</div>
+              </div>  
+            </div>
+          ) : ('')}
+          {error && <div>There was an error retrieving the weather.</div>}
+        </main>
+      </div>
     </div>
   );
 }
